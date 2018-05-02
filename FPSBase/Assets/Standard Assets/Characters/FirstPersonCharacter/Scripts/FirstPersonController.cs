@@ -27,7 +27,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [SerializeField] private AudioClip[] m_FootstepSounds;    // an array of footstep sounds that will be randomly selected from.
         [SerializeField] private AudioClip m_JumpSound;           // the sound played when character leaves the ground.
         [SerializeField] private AudioClip m_LandSound;           // the sound played when character touches back on ground.
+
+        //things that I have added
         public bool isSideView = false;
+        private Quaternion originalCamRotation;
+
 
         private Camera m_Camera;
         private bool m_Jump;
@@ -49,6 +53,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             m_CharacterController = GetComponent<CharacterController>();
             m_Camera = Camera.main;
+            originalCamRotation = m_Camera.transform.localRotation;
             m_OriginalCameraPosition = m_Camera.transform.localPosition;
             m_FovKick.Setup(m_Camera);
             m_HeadBob.Setup(m_Camera, m_StepInterval);
@@ -99,7 +104,17 @@ namespace UnityStandardAssets.Characters.FirstPerson
             float speed;
             GetInput(out speed);
             // always move along the camera forward as it is the direction that it being aimed at
-            Vector3 desiredMove = transform.forward*m_Input.y + transform.right*m_Input.x;
+            Vector3 desiredMove;
+            if (!isSideView)
+            {
+                desiredMove = transform.forward * m_Input.y + transform.right * m_Input.x;
+            }
+            else
+            {
+                Vector3 xDirection = new Vector3(0.0f, 0.0f, 1.0f);
+                desiredMove = xDirection * m_Input.y;
+            }
+
 
             // get a normal for the surface that is being touched to move along it
             RaycastHit hitInfo;
@@ -107,8 +122,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
                                m_CharacterController.height/2f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
             desiredMove = Vector3.ProjectOnPlane(desiredMove, hitInfo.normal).normalized;
 
-            m_MoveDir.x = desiredMove.x*speed;
-            m_MoveDir.z = desiredMove.z*speed;
+
+            m_MoveDir.x = desiredMove.x * speed;
+            m_MoveDir.z = desiredMove.z * speed;
+
+
 
 
             if (m_CharacterController.isGrounded)
@@ -215,9 +233,18 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private void GetInput(out float speed)
         {
             // Read input
-            float horizontal = CrossPlatformInputManager.GetAxis("Horizontal");
-            float vertical = CrossPlatformInputManager.GetAxis("Vertical");
+            float horizontal, vertical;
 
+            if (!isSideView)
+            {
+                horizontal = CrossPlatformInputManager.GetAxis("Horizontal");
+                vertical = CrossPlatformInputManager.GetAxis("Vertical");
+            }
+            else
+            {
+                vertical = CrossPlatformInputManager.GetAxis("Horizontal");
+                horizontal = 0.0f;
+            }
             bool waswalking = m_IsWalking;
 
 #if !MOBILE_INPUT

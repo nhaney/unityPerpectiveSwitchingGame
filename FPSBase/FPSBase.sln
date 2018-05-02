@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
+# Visual Studio 2017
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FPSBase.Plugins", "FPSBase.Plugins.csproj", "{2BD66642-FF9B-4A7D-FE85-66464CA56D48}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FPSBase", "FPSBase.csproj", "{C9AD5437-4585-405E-97B7-5B253EC8EDFA}"
